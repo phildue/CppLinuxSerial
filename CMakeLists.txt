@@ -60,4 +60,7 @@ include_directories(include)
 add_subdirectory(src)
 if(BUILD_TESTS)
     add_subdirectory(test/unit)
+    add_subdirectory(test/arduino)
+
 endif()
+
