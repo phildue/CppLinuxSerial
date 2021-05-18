@@ -509,5 +509,45 @@ namespace CppLinuxSerial {
         timeout_ms_ = timeout_ms;
     }
 
+    int SerialPort::Read(std::stringstream &data, int nBytes) {
+
+        if(fileDesc_ == 0) {
+            //this->sp->PrintError(SmartPrint::Ss() << "Read() was called but file descriptor (fileDesc) was 0, indicating file has not been opened.");
+            //return false;
+            THROW_EXCEPT("Read() was called but file descriptor (fileDesc) was 0, indicating file has not been opened.");
+        }
+
+        // Allocate memory for read buffer
+//		char buf [256];
+//		memset (&buf, '\0', sizeof buf);
+
+        // Read from file
+        // We provide the underlying raw array from the readBuffer_ vector to this C api.
+        // This will work because we do not delete/resize the vector while this method
+        // is called
+        char buffer[nBytes];
+        ssize_t n = read(fileDesc_, &buffer[0], nBytes);
+
+        // Error Handling
+        if(n < 0) {
+            // Read was unsuccessful
+            throw std::system_error(EFAULT, std::system_category());
+        }
+
+        if(n > 0) {
+
+//			buf[n] = '\0';
+            //printf("%s\r\n", buf);
+//			data.append(buf);
+            data << std::string(&buffer[0], n);
+            //std::cout << *str << " and size of string =" << str->size() << "\r\n";
+        }
+
+        return n;
+        // If code reaches here, read must of been successful
+    }
+
+
+
 } // namespace CppLinuxSerial
 } // namespace mn

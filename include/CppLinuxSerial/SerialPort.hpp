@@ -125,6 +125,8 @@ namespace mn {
             /// \throws		CppLinuxSerial::Exception if state != OPEN.
             void Read(std::string& data);
 
+            int Read(std::stringstream& data,int nBytes);
+
         private:
 
             /// \brief		Returns a populated termios structure for the passed in file descriptor.
