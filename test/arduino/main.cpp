@@ -21,18 +21,20 @@ int main() {
     serial._serialPort.Open();
 
     // Write some ASCII datae
-    const float T_MS = 100;
+    const float T_MS = 10;
 
 
     for(int i = 0; i < 1000; i++)
     {
-        float setPoint = std::sin((float)i/10.0)*16.0;
+        float setPoint = std::sin((float)i/10.0)*12.0;
         if (setPoint < 4)
         {
             setPoint = 4;
         }
-
+//        setPoint = 0;
         auto msgOut = std::make_shared<SerialProtocol::MsgCmdVel>(setPoint,-1*setPoint,i);
+//        auto msgOut = std::make_shared<SerialProtocol::MsgCmdVel>(0,-1*setPoint,i);
+//        auto msgOut = std::make_shared<SerialProtocol::MsgCmdVel>(setPoint,0,i);
         std::cout << "Sending:\n" << msgOut->str() << std::endl;
 
         serial.send(msgOut);

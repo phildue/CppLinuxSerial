@@ -59,13 +59,13 @@ SerialProtocol::MsgCmdVel::MsgCmdVel(float vl, float vr, uint64_t t) :Message(Ms
 
 SerialProtocol::MsgState::MsgState(const std::string& raw):Message(raw)
 {
-    _stateLeft.wheelTicks = std::stof(_fields[2]);
+    _stateLeft.position = std::stof(_fields[2]);
     _stateLeft.angularVelocityCmd = std::stof(_fields[3]);
     _stateLeft.angularVelocity = std::stof(_fields[4]);
     _stateLeft.err = std::stof(_fields[5]);
     _stateLeft.dutySet = std::stof(_fields[6]);
 
-    _stateRight.wheelTicks = std::stof(_fields[7]);
+    _stateRight.position = std::stof(_fields[7]);
     _stateRight.angularVelocityCmd = std::stof(_fields[8]);
     _stateRight.angularVelocity = std::stof(_fields[9]);
     _stateRight.err = std::stof(_fields[10]);
@@ -75,8 +75,8 @@ SerialProtocol::MsgState::MsgState(const std::string& raw):Message(raw)
 SerialProtocol::MsgState::MsgState(const State& stateLeft, const State& stateRight, uint64_t t):_stateLeft(stateLeft),_stateRight(stateRight),Message(MsgType::STATE,t)
 {
     std::stringstream ss;
-    ss << to_string(_type) << " " << t << " " << stateLeft.wheelTicks << " " << stateLeft.angularVelocityCmd << " " << stateLeft.angularVelocity << " " << stateLeft.err;
-    ss << stateRight.wheelTicks << " " << stateRight.angularVelocityCmd << " " << stateRight.angularVelocity << " " << stateRight.err;
+    ss << to_string(_type) << " " << t << " " << stateLeft.position << " " << stateLeft.angularVelocityCmd << " " << stateLeft.angularVelocity << " " << stateLeft.err;
+    ss << stateRight.position << " " << stateRight.angularVelocityCmd << " " << stateRight.angularVelocity << " " << stateRight.err;
     ss << "\n";
     _str = ss.str();
 }
@@ -85,7 +85,7 @@ std::string SerialProtocol::MsgState::str() const {
     ss.precision(4);
     ss << "       |" << std::setw(6) <<"L" << " |" << std::setw(8) <<"R|\n";
     ss << " t |" << std::setw(6) << (double)_t << " |" << std::setw(6) << (double)_t << "|\n";
-    ss << " ticks |" << std::setw(6) << (double)_stateLeft.wheelTicks << " |" << std::setw(6) << (double)_stateRight.wheelTicks << "|\n";
+    ss << " p |" << std::setw(6) << _stateLeft.position << " |" << std::setw(6) << _stateRight.position << "|\n";
     ss << " v*    |" << std::setw(6) << _stateLeft.angularVelocityCmd << " |" << std::setw(6) << _stateRight.angularVelocityCmd << "|\n";
     ss << " v     |" << std::setw(6) << _stateLeft.angularVelocity << " |" << std::setw(6) << _stateRight.angularVelocity << "|\n";
     ss << " err   |" << std::setw(6) << _stateLeft.err << " |" << std::setw(6) << _stateRight.err << "|\n";
@@ -114,13 +114,16 @@ void SerialProtocol::read(int nMessages) {
                     default:
                         _messages.push_back(std::make_shared<Message>(raw));
                 }
+
+                _buffer = std::stringstream();
+                readMessages++;
             }catch(const std::exception& e)
             {
+                _buffer = std::stringstream();
                 throw ParseError(e.what(),raw);
             }
 
-            _buffer = std::stringstream();
-            readMessages++;
+
         }
     }while(nBytes > 0 && readMessages < nMessages);
 }

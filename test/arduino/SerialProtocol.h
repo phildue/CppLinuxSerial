@@ -21,15 +21,15 @@ class SerialProtocol
 {
 public:
 
-class ParseError : public std::runtime_error
-{
-public:
-    ParseError(const std::string& errorMessage,const std::string& parsedMessage):std::runtime_error(errorMessage),_parsedMessage(parsedMessage)
+    class ParseError : public std::runtime_error
     {
+    public:
+        ParseError(const std::string& errorMessage,const std::string& parsedMessage):std::runtime_error(errorMessage),_parsedMessage(parsedMessage)
+        {
 
-    }
-    const std::string _parsedMessage;
-};
+        }
+        const std::string _parsedMessage;
+    };
 
     enum class MsgType{
         UNKNOWN,
@@ -66,7 +66,7 @@ public:
 
     struct State
     {
-        float angularVelocityCmd, angularVelocity,wheelTicks,err,dutySet;
+        float angularVelocityCmd, angularVelocity,position,err,dutySet;
 
     };
     struct MsgState : public Message
